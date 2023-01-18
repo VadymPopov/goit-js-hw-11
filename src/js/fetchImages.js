@@ -12,8 +12,13 @@ export async function getImages(userInput, page) {
     page: page
   });
   
+  try {
   const response = await axios.get(`${BASE_URL}?key=${key}&q=${userInput}&${searchParams}`);
   const images = await response.data;
   return images;
+
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 

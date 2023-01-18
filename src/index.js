@@ -23,20 +23,26 @@ refs.form.addEventListener('submit', onFormSubmit);
 refs.loadBtn.addEventListener('click', onLoadBtnClick);
 
 
-function onFormSubmit(evt) {
-    evt.preventDefault();
-    cleanUpMarkup(refs.gallery)
-    page = 1;
+async function onFormSubmit(evt) {
+  evt.preventDefault();
+  cleanUpMarkup(refs.gallery)
+  page = 1;
 
-    const userInput = evt.target.searchQuery.value.trim();
-    localStorage.setItem('input', userInput);
+  const userInput = evt.target.searchQuery.value.trim();
+  localStorage.setItem('input', userInput);
 
-    if(userInput === ''){
-      Notify.info("Search line can't be empty, try again");
-      return
-    }
+  if(!userInput){
+    Notify.info("Search line can't be empty, try again");
+    return
+  }
+  const data = await getImages(userInput, page);
+  console.log(data);
 
-    getImages(userInput, page).then(data=>searchRequest(data)).catch(err=>onFetchError(err));
+  try {
+    searchRequest(data);
+  } catch(error) {
+    onFetchError(error);
+  }
 }
 
 function searchRequest(arr) {
@@ -55,11 +61,15 @@ function searchRequest(arr) {
 }
 
 
-function onLoadBtnClick() {
+async function onLoadBtnClick() {
   page+=1;
   const input = localStorage.getItem('input');
-  getImages(input, page).then(data=>LoadMoreRequest(data)).catch(err=>onFetchError(err));
-
+  const data = await getImages(input, page); 
+  try {
+    LoadMoreRequest(data)
+  } catch(error) {
+    onFetchError(error)
+  }
 }
 
 function LoadMoreRequest(arr) {
